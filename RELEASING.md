@@ -56,11 +56,16 @@ With `glab` this is: `glab variable set GITHUB_TOKEN --masked --protected` (it a
 
 ### 5. OpenTofu Registry
 
-OpenTofu does not use a web login. Providers are added by the registry's own repository:
+OpenTofu has no web login: you submit two **GitHub issue forms** on github.com/opentofu/registry, in the browser. They must be filled in through the form UI; issues made with `gh`, the API or by hand are ignored and closed.
 
-1. Open https://github.com/opentofu/registry/issues/new/choose and take the template for **submitting a provider**. Fill in the repository (`Adatage/terraform-provider-adatage`). A maintainer bot opens a pull request that adds the provider.
-2. The registry also needs the **public** key: the instructions in that issue ask for `public.asc` (it goes in the registry repository's `keys/` folder, in a folder for the namespace and named by the key's fingerprint: `gpg --fingerprint AAAAAAAAAAAAAAAA`). Follow the template; the exact file layout is the one it states.
-3. When the pull request is merged, new releases of the repository are picked up from GitHub without more steps (the registry reads the GitHub releases and the signature).
+1. Make your membership of the Adatage organization public (GitHub: the organization's *People* page > your row > visibility *Public*). Validation fails otherwise.
+2. **Signing key**: https://github.com/opentofu/registry/issues/new?template=provider_key.yml
+   - Provider Namespace: `Adatage`
+   - Provider Name: `adatage` (or leave empty to use the key for every provider of the organization)
+   - tick "I have made my membership public"
+   - Provider GPG Key: the whole content of `public.asc`
+3. **Provider**: https://github.com/opentofu/registry/issues/new?template=provider.yml with the repository `Adatage/terraform-provider-adatage`.
+4. The OpenTofu team reviews and approves; after that new GitHub releases are picked up on their own. Do both after the first release exists. The rules are in the registry's `POLICY.md`.
 
 ### 6. The first release
 
