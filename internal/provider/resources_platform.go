@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/adatage/terraform-provider-adatage/internal/client"
+	"github.com/Adatage/terraform-provider-adatage/internal/client"
 )
 
 var clusterRunning = states{path: "state", ready: []string{"STATE_RUNNING"}, failed: []string{"STATE_ERROR"}}

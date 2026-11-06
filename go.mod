@@ -1,4 +1,4 @@
-module github.com/adatage/terraform-provider-adatage
+module github.com/Adatage/terraform-provider-adatage
 
 go 1.25.0
 

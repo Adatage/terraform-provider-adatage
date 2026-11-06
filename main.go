@@ -5,7 +5,7 @@ import (
 	"flag"
 	"log"
 
-	"github.com/adatage/terraform-provider-adatage/internal/provider"
+	"github.com/Adatage/terraform-provider-adatage/internal/provider"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 )
 

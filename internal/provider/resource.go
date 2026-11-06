@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/adatage/terraform-provider-adatage/internal/client"
+	"github.com/Adatage/terraform-provider-adatage/internal/client"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	dsschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/diag"

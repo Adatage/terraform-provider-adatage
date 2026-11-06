@@ -3,7 +3,7 @@ package provider
 import (
 	"context"
 
-	"github.com/adatage/terraform-provider-adatage/internal/client"
+	"github.com/Adatage/terraform-provider-adatage/internal/client"
 )
 
 var networkReady = states{path: "state", ready: []string{"PHASE_STATE_READY"}, failed: []string{"PHASE_STATE_ERROR"}}

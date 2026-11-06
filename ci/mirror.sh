@@ -4,11 +4,11 @@
 # (signed zips and checksums); the Terraform and OpenTofu registries take the release from GitHub. See RELEASING.md.
 #
 # Needs the CI variable GITHUB_TOKEN (a token that may push to the repository, including workflow files and tags), and optionally
-# TF_PROVIDER_GITHUB_REPO (default adatage/terraform-provider-adatage).
+# TF_PROVIDER_GITHUB_REPO (default Adatage/terraform-provider-adatage).
 set -eu
 
 : "${GITHUB_TOKEN:?set the CI variable GITHUB_TOKEN to a GitHub token that can push to the provider repository}"
-repo="${TF_PROVIDER_GITHUB_REPO:-adatage/terraform-provider-adatage}"
+repo="${TF_PROVIDER_GITHUB_REPO:-Adatage/terraform-provider-adatage}"
 dir=apps/terraform-provider-adatage
 version="$(tr -d ' \n' <"$dir/VERSION")"
 case "$version" in

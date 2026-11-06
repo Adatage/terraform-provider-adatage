@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/adatage/terraform-provider-adatage/internal/client"
+	"github.com/Adatage/terraform-provider-adatage/internal/client"
 )
 
 func imageDataSource() *DataSource {

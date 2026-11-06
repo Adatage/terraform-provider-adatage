@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/adatage/terraform-provider-adatage/internal/provider"
+	"github.com/Adatage/terraform-provider-adatage/internal/provider"
 )
 
 func write(path, text string) {

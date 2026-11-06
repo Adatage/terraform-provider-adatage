@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/adatage/terraform-provider-adatage/internal/client"
+	"github.com/Adatage/terraform-provider-adatage/internal/client"
 )
 
 const (

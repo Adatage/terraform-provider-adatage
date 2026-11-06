@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/adatage/terraform-provider-adatage/internal/client"
+	"github.com/Adatage/terraform-provider-adatage/internal/client"
 )
 
 var instanceRunning = states{path: "status.state", ready: []string{"PHASE_STATE_RUNNING"}, failed: []string{"PHASE_STATE_INTERNAL_ERROR", "PHASE_STATE_GUEST_PANIC"}}
