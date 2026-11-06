@@ -1,0 +1,39 @@
+{
+  "name": "terraform-provider-adatage",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": ".",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/bin"],
+      "options": {
+        "command": "GOWORK=off go vet ./... && GOWORK=off CGO_ENABLED=0 go build -trimpath -o bin/terraform-provider-adatage .",
+        "cwd": "{projectRoot}"
+      },
+      "metadata": {
+        "description": "Vet and compile the Terraform/OpenTofu provider (a standalone module, outside go.work)"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "GOWORK=off go test ./...",
+        "cwd": "{projectRoot}"
+      },
+      "metadata": {
+        "description": "Run the provider's unit tests"
+      }
+    },
+    "docs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "GOWORK=off go run ./cmd/gendocs .",
+        "cwd": "{projectRoot}"
+      },
+      "metadata": {
+        "description": "Regenerate docs/ for the registries from the resource definitions"
+      }
+    }
+  }
+}
