@@ -457,6 +457,7 @@ func allResources() []*Resource {
 		diskResource(), instanceResource(), templateResource(), snapshotResource(),
 		kubernetesClusterResource(), kubernetesNodePoolResource(),
 		healthCheckResource(), backendServiceResource(), forwardingRuleResource(),
+		databaseResource(), databaseBackupResource(),
 		iamRoleResource(), serviceAccountResource(), serviceAccountKeyResource(),
 	}
 }

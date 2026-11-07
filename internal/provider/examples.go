@@ -151,6 +151,41 @@ resource "adatage_public_ip" "web_lb" {
   subnet_id    = adatage_subnet.app.id
   private_ipv4 = adatage_load_balancer_forwarding_rule.web.address
 }`,
+	"resource.database_instance": `
+data "adatage_database_engine_versions" "postgres" {
+  engine = "postgres"
+}
+
+resource "adatage_database_instance" "main" {
+  name        = "main"
+  engine      = "postgres"
+  version     = data.adatage_database_engine_versions.postgres.default_version
+  region_code = "eu-central-01"
+  zone_code   = "a"
+  subnet_id   = adatage_subnet.app.id
+
+  vcpus      = 2
+  memory_mib = 4096
+  disk_gib   = 50
+  node_count = 2 # a primary and a replica, with automatic failover
+
+  backup_window         = "03:00"
+  backup_retention_days = 14
+}
+
+output "database_uri" {
+  value     = adatage_database_instance.main.uri
+  sensitive = true
+}`,
+	"resource.database_backup": `
+resource "adatage_database_backup" "before_upgrade" {
+  instance_id = adatage_database_instance.main.id
+  description = "before the upgrade"
+}`,
+	"data.database_engine_versions": `
+data "adatage_database_engine_versions" "valkey" {
+  engine = "valkey"
+}`,
 	"resource.iam_role": `
 resource "adatage_iam_role" "viewer" {
   name        = "Viewer"

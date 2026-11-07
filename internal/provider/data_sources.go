@@ -141,5 +141,5 @@ func clusterCredentialsDataSource() *DataSource {
 }
 
 func allDataSources() []*DataSource {
-	return []*DataSource{imageDataSource(), networkDataSource(), subnetDataSource(), clusterCredentialsDataSource()}
+	return []*DataSource{imageDataSource(), networkDataSource(), subnetDataSource(), clusterCredentialsDataSource(), databaseEngineVersionsDataSource()}
 }

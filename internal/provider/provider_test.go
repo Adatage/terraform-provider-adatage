@@ -275,6 +275,10 @@ func TestPlanCreate(t *testing.T) {
 		"name": "k", "region_code": "r", "zone_code": "a", "subnet_id": "5",
 		"node_pool": map[string]any{"name": "p", "series_code": "general", "vcpus": int64(2), "memory_mib": int64(2048), "size": int64(3)},
 	})
+	plan("adatage_database_instance", databaseResource(), Values{
+		"name": "db", "engine": "postgres", "region_code": "r", "zone_code": "a", "subnet_id": "5", "vcpus": int64(2), "memory_mib": int64(2048), "disk_gib": int64(20),
+		"allowed_cidrs": []any{"203.0.113.0/24"}, "labels": map[string]any{"team": "a"},
+	})
 	plan("adatage_load_balancer_backend_service", backendServiceResource(), Values{"name": "b", "backends": []any{map[string]any{"instance_id": "9"}}})
 	plan("adatage_kubernetes_node_pool", kubernetesNodePoolResource(), Values{"cluster_id": "1", "name": "p", "series_code": "g", "vcpus": int64(2), "memory_mib": int64(2048), "size": int64(1),
 		"taints": []any{map[string]any{"key": "k", "value": "v", "effect": "NoSchedule"}}})

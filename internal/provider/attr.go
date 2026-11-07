@@ -45,6 +45,8 @@ type Attr struct {
 	// Enum is the prefix of the API's enum values; Terraform sees them lower case without it (IP_TYPE_IPV4_ONLY is ipv4_only).
 	Enum   string
 	Nested []Attr
+	// KeepPrior keeps the value the plan or state had when the API leaves it out (an address asked for that is not assigned yet).
+	KeepPrior bool
 }
 
 func camel(s string) string {
@@ -362,9 +364,15 @@ func readValues(attrs []Attr, obj map[string]any, prior Values, nested bool) Val
 		raw, ok := lookup(obj, a.path())
 		if !ok {
 			out[a.Name] = zero(a)
+			if a.KeepPrior && p != nil {
+				out[a.Name] = p
+			}
 			continue
 		}
 		out[a.Name] = keepSpelling(a, p, convert(a, raw))
+		if a.KeepPrior && out[a.Name] == "" && p != nil {
+			out[a.Name] = p
+		}
 	}
 	return out
 }
