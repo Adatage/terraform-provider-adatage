@@ -2,7 +2,7 @@ package provider
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
 	"github.com/Adatage/terraform-provider-adatage/internal/client"
 )
@@ -200,7 +200,7 @@ func publicIPResource() *Resource {
 			return nil
 		}
 		if p.Str("private_ipv4") == "" {
-			return fmt.Errorf("private_ipv4 is required with subnet_id: the private address (of an instance or a load balancer) the public address is translated to")
+			return errors.New("private_ipv4 is required with subnet_id: the private address (of an instance or a load balancer) the public address is translated to")
 		}
 		body := map[string]any{"publicIpId": id, "subnetId": p.Str("subnet_id")}
 		body["privateIpv4"] = p.Str("private_ipv4")

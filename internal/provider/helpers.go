@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 
@@ -29,15 +30,6 @@ type states struct {
 	failed []string
 }
 
-func contains(list []string, s string) bool {
-	for _, x := range list {
-		if x == s {
-			return true
-		}
-	}
-	return false
-}
-
 func pollUntil(ctx context.Context, fn func() (bool, error)) error {
 	for {
 		done, err := fn()
@@ -60,14 +52,14 @@ func waitState(ctx context.Context, get func() (map[string]any, error), s states
 		}
 		v, _ := lookup(obj, s.path)
 		state, _ := v.(string)
-		if contains(s.failed, state) {
+		if slices.Contains(s.failed, state) {
 			msg, _ := obj["message"].(string)
 			if msg == "" {
 				msg, _ = obj["errorMessage"].(string)
 			}
 			return false, fmt.Errorf("it is in state %s %s", state, msg)
 		}
-		return contains(s.ready, state), nil
+		return slices.Contains(s.ready, state), nil
 	})
 }
 

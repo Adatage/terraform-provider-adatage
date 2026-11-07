@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -27,7 +28,7 @@ func diskResource() *Resource {
 			case len(parts) == 2:
 				return Values{"id": fmt.Sprintf("zones/%s/disks/%s", parts[0], parts[1]), "zone": parts[0], "disk_id": parts[1]}, nil
 			}
-			return nil, fmt.Errorf("expected zone/disk or zones/ZONE/disks/DISK")
+			return nil, errors.New("expected zone/disk or zones/ZONE/disks/DISK")
 		},
 		Attrs: []Attr{
 			{Name: "id", Kind: String, Computed: true, Stable: true, Path: "name", Desc: "zones/ZONE/disks/DISK."},
