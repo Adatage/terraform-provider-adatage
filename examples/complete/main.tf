@@ -68,7 +68,8 @@ resource "adatage_instance" "web" {
 resource "adatage_public_ip" "web" {
   name        = "web"
   region_code = "eu-central-01"
-  subnet_id   = adatage_subnet.app.id
+  subnet_id    = adatage_subnet.app.id
+  private_ipv4 = adatage_instance.web.primary_ipv4
 }
 
 output "web_public_address" {

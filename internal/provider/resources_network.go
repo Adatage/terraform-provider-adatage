@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Adatage/terraform-provider-adatage/internal/client"
 )
@@ -198,21 +199,24 @@ func publicIPResource() *Resource {
 		if p.Str("subnet_id") == "" {
 			return nil
 		}
+		if p.Str("private_ipv4") == "" {
+			return fmt.Errorf("private_ipv4 is required with subnet_id: the private address (of an instance or a load balancer) the public address is translated to")
+		}
 		body := map[string]any{"publicIpId": id, "subnetId": p.Str("subnet_id")}
-		set(body, "privateIpv4", p.Str("private_ipv4"))
+		body["privateIpv4"] = p.Str("private_ipv4")
 		_, err := c.Call(ctx, svcNetwork, "AddPublicIpNat", body)
 		return err
 	}
 	return &Resource{
 		Name: "public_ip",
-		Desc: "A public IPv4 address, optionally translated 1:1 (NAT) to a private address in a subnet. Set subnet_id (and optionally private_ipv4) to attach it; load balancers and Kubernetes use the same mechanism.",
+		Desc: "A public IPv4 address, optionally translated 1:1 (NAT) to a private address that an instance or a load balancer holds in a subnet. Set subnet_id and private_ipv4 together to attach it.",
 		Attrs: []Attr{
 			idAttr("publicIpId"),
 			{Name: "name", Kind: String, Required: true},
 			{Name: "region_code", Kind: String, Required: true, ForceNew: true, Desc: "The region, for example eu-central-01."},
 			{Name: "address", Kind: String, Computed: true, Stable: true, Desc: "The public address."},
 			{Name: "subnet_id", Kind: String, Optional: true, Desc: "The subnet of the private address the public address is translated to."},
-			{Name: "private_ipv4", Kind: String, Optional: true, Computed: true, Desc: "The private address; chosen in the subnet when empty."},
+			{Name: "private_ipv4", Kind: String, Optional: true, Computed: true, Desc: "The private address the public address is translated to (required with subnet_id): the address of an instance interface or of a load balancer."},
 			{Name: "network_id", Kind: String, Computed: true},
 			{Name: "state", Kind: String, Computed: true, Enum: "STATE_", Desc: "unassociated, pending, active or balanced."},
 			createdAttr("createdAt"),

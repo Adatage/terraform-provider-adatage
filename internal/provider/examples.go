@@ -34,7 +34,10 @@ resource "adatage_firewall_rule" "ssh" {
 resource "adatage_public_ip" "web" {
   name        = "web"
   region_code = "eu-central-01"
-  subnet_id   = adatage_subnet.app.id # translated 1:1 to a private address of the subnet
+
+  # translated 1:1 to a private address of an instance (or of a load balancer) in the subnet
+  subnet_id    = adatage_subnet.app.id
+  private_ipv4 = adatage_instance.web.primary_ipv4
 }`,
 	"resource.disk": `
 resource "adatage_disk" "data" {
