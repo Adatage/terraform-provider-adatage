@@ -295,7 +295,6 @@ func instanceResource() *Resource {
 
 var templateReady = states{path: "status", ready: []string{"TEMPLATE_STATUS_READY"}, failed: []string{"TEMPLATE_STATUS_ERROR"}}
 
-// capture is the template and the snapshot: both are made from an instance and read, listed and deleted the same way.
 func capture(name, desc, service, kind, idField string) *Resource {
 	get := func(ctx context.Context, c *client.Client, id string) (map[string]any, error) {
 		obj, err := c.Call(ctx, service, "Get"+kind, map[string]any{"name": id})

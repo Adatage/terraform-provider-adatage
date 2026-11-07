@@ -1,6 +1,5 @@
 package provider
 
-// Examples are the snippets of the documentation pages, by "resource.<name>" and "data.<name>".
 var Examples = map[string]string{
 	"resource.ssh_key": `
 resource "adatage_ssh_key" "admin" {

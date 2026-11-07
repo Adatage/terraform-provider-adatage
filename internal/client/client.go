@@ -1,6 +1,5 @@
-// Package client calls the Adatage Cloud API: ConnectRPC with JSON bodies over HTTP, signed in as a service account (see
-// docs/cloud-platform/service-accounts.md in the platform repository). It depends on nothing but the standard library, so the
-// provider builds without the platform's private modules.
+// Package client calls the Adatage Cloud API: ConnectRPC with JSON bodies over HTTP, signed in as a service
+// account (see docs/cloud-platform/service-accounts.md in the platform repository).
 package client
 
 import (
@@ -27,7 +26,6 @@ import (
 
 const DefaultAPI = "https://api.cloud.adatage.com"
 
-// Credentials is the JSON file that CreateServiceAccountKey returns.
 type Credentials struct {
 	Type             string `json:"type"`
 	ServiceAccountID string `json:"service_account_id"`
@@ -37,7 +35,6 @@ type Credentials struct {
 	TokenURI         string `json:"token_uri"`
 }
 
-// ParseCredentials reads the file's content, or the path of the file when the text is not JSON.
 func ParseCredentials(text string) (*Credentials, error) {
 	text = strings.TrimSpace(text)
 	if !strings.HasPrefix(text, "{") {
@@ -57,7 +54,6 @@ func ParseCredentials(text string) (*Credentials, error) {
 	return &c, nil
 }
 
-// Error is an error answered by the API.
 type Error struct {
 	Code    string
 	Message string
@@ -66,7 +62,6 @@ type Error struct {
 
 func (e *Error) Error() string { return fmt.Sprintf("%s: %s", e.Code, e.Message) }
 
-// IsNotFound reports whether err is the API's "not found".
 func IsNotFound(err error) bool {
 	var e *Error
 	return errors.As(err, &e) && (e.Code == "not_found" || e.Status == http.StatusNotFound)
@@ -84,7 +79,6 @@ type Client struct {
 	until time.Time
 }
 
-// New makes a client. Either credentials or a static access token is needed.
 func New(api, project string, creds *Credentials, accessToken string) (*Client, error) {
 	if api == "" {
 		api = DefaultAPI
@@ -236,7 +230,6 @@ func (c *Client) post(ctx context.Context, url, token string, extra map[string]s
 	return last
 }
 
-// Call runs one method of a service in the project and returns the answer as a JSON object.
 func (c *Client) Call(ctx context.Context, service, method string, body map[string]any) (map[string]any, error) {
 	token, err := c.bearer(ctx)
 	if err != nil {
@@ -250,7 +243,6 @@ func (c *Client) Call(ctx context.Context, service, method string, body map[stri
 	return out, err
 }
 
-// WaitOperation waits for a long-running operation (cloud.external.compute.v1.Operation) and returns it when done.
 func (c *Client) WaitOperation(ctx context.Context, op map[string]any) (map[string]any, error) {
 	name, _ := op["name"].(string)
 	for {

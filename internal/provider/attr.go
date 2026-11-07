@@ -9,9 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
 )
 
-// The provider describes every resource and data source as a list of Attr and a few functions that call the API. The engine in
-// resource.go turns that into a Terraform schema, plans and state. Values travel as Go values: string, int64, bool, []any,
-// map[string]any, nil for null.
+// The provider describes every resource and data source as a list of Attr and a few functions that call the API.
 
 type Kind int
 
@@ -21,7 +19,6 @@ const (
 	Bool
 	StringList
 	StringMap
-	// List is a list of objects described by Nested; Object is one such object.
 	List
 	Object
 )
@@ -32,20 +29,17 @@ type Attr struct {
 	Kind Kind
 
 	Required, Optional, Computed bool
-	// ForceNew replaces the resource when the attribute changes.
-	ForceNew bool
-	// Stable computed values do not change by themselves, so a plan keeps them.
-	Stable    bool
-	Sensitive bool
-	// Local attributes are not read back from the API: they hold what the configuration (or Create) said.
-	Local bool
-	// Path is where the API's JSON object has the value, dotted ("spec.sizeGib", "nics.0.status.ipv4Address"); empty means the name in
-	// camelCase.
+	ForceNew                     bool
+	Stable                       bool
+	Sensitive                    bool
+	Local                        bool
+	// Path is where the API's JSON object has the value, dotted ("spec.sizeGib", "nics.0.status.ipv4Address"); empty
+	// means the name in camelCase.
 	Path string
-	// Enum is the prefix of the API's enum values; Terraform sees them lower case without it (IP_TYPE_IPV4_ONLY is ipv4_only).
-	Enum   string
-	Nested []Attr
-	// KeepPrior keeps the value the plan or state had when the API leaves it out (an address asked for that is not assigned yet).
+	// Enum is the prefix of the API's enum values; Terraform sees them lower case without it (IP_TYPE_IPV4_ONLY is
+	// ipv4_only).
+	Enum      string
+	Nested    []Attr
 	KeepPrior bool
 }
 
@@ -98,7 +92,6 @@ var unknown = unknownValue{}
 
 func isUnknown(v any) bool { _, ok := v.(unknownValue); return ok }
 
-// Values is an object: attribute name to Go value.
 type Values map[string]any
 
 func (v Values) known(name string) any {
@@ -160,7 +153,6 @@ func (v Values) Objs(name string) []Values {
 
 func (v Values) Obj(name string) Values { return Values(v.Map(name)) }
 
-// toGo converts a Terraform value. Unknown values become the unknown marker.
 func toGo(v tftypes.Value) (any, error) {
 	if !v.IsKnown() {
 		return unknown, nil
@@ -217,7 +209,6 @@ func toGo(v tftypes.Value) (any, error) {
 	return nil, fmt.Errorf("unsupported type %s", t)
 }
 
-// fromGo builds a Terraform value of type t.
 func fromGo(t tftypes.Type, x any) (tftypes.Value, error) {
 	if x == nil {
 		return tftypes.NewValue(t, nil), nil
@@ -322,7 +313,6 @@ func zero(a Attr) any {
 
 func fromEnum(prefix, s string) string { return strings.ToLower(strings.TrimPrefix(s, prefix)) }
 
-// Enum turns a Terraform value into the API's.
 func Enum(prefix, s string) string {
 	if s == "" {
 		return ""
@@ -343,12 +333,10 @@ func asInt(x any) (int64, bool) {
 	return 0, false
 }
 
-// readObject turns the API's JSON object into the values of attrs. prior holds what the plan or state had.
 func readObject(attrs []Attr, obj map[string]any, prior Values) Values {
 	return readValues(attrs, obj, prior, false)
 }
 
-// readValues reads the attributes; inside a list or object everything the API returns is taken, as there is no prior value to match.
 func readValues(attrs []Attr, obj map[string]any, prior Values, nested bool) Values {
 	out := Values{}
 	for _, a := range attrs {
@@ -377,9 +365,9 @@ func readValues(attrs []Attr, obj map[string]any, prior Values, nested bool) Val
 	return out
 }
 
-// keepSpelling returns what the plan or state had when the API's value only differs in what Terraform treats as the same thing: the
-// whitespace around a text (a key file ends in a newline the API trims) and the order of a list the API sorts. Otherwise Terraform
-// reports an inconsistent result after apply.
+// keepSpelling returns what the plan or state had when the API's value only differs in what Terraform treats as
+// the same thing: the whitespace around a text (a key file ends in a newline the API trims) and the order of a
+// list the API sorts.
 func keepSpelling(a Attr, prior, got any) any {
 	switch a.Kind {
 	case String:

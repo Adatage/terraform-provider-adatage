@@ -23,7 +23,6 @@ const (
 	svcAccounts   = "cloud.external.iam.v1.ServiceAccountService"
 )
 
-// Ready and failed states are the API's own spellings.
 type states struct {
 	path   string
 	ready  []string
@@ -39,7 +38,6 @@ func contains(list []string, s string) bool {
 	return false
 }
 
-// pollUntil calls fn every few seconds until it says it is done.
 func pollUntil(ctx context.Context, fn func() (bool, error)) error {
 	for {
 		done, err := fn()
@@ -54,7 +52,6 @@ func pollUntil(ctx context.Context, fn func() (bool, error)) error {
 	}
 }
 
-// waitState waits until the object's state is one of the ready values.
 func waitState(ctx context.Context, get func() (map[string]any, error), s states) error {
 	return pollUntil(ctx, func() (bool, error) {
 		obj, err := get()
@@ -74,7 +71,6 @@ func waitState(ctx context.Context, get func() (map[string]any, error), s states
 	})
 }
 
-// waitGone waits until the object cannot be found any more.
 func waitGone(ctx context.Context, get func() (map[string]any, error)) error {
 	return pollUntil(ctx, func() (bool, error) {
 		_, err := get()
@@ -85,7 +81,6 @@ func waitGone(ctx context.Context, get func() (map[string]any, error)) error {
 	})
 }
 
-// lastSegment is the id at the end of a name such as projects/1/instances/2.
 func lastSegment(s string) string {
 	if i := strings.LastIndex(s, "/"); i >= 0 {
 		return s[i+1:]
@@ -93,7 +88,6 @@ func lastSegment(s string) string {
 	return s
 }
 
-// ids is the shorthand for the Values a Create returns.
 func ids(kv ...any) Values {
 	out := Values{}
 	for i := 0; i+1 < len(kv); i += 2 {
@@ -113,7 +107,6 @@ func str(obj map[string]any, path string) string {
 	return ""
 }
 
-// set puts the Terraform value of an attribute into a request when it has one.
 func set(body map[string]any, key string, v any) {
 	switch x := v.(type) {
 	case string:
@@ -148,7 +141,6 @@ func strMap(m map[string]any) map[string]any {
 	return out
 }
 
-// listFind finds the element of a list answer whose key has the value.
 func listFind(list map[string]any, field, key, value string) (map[string]any, error) {
 	items, _ := list[field].([]any)
 	for _, it := range items {
@@ -167,7 +159,6 @@ func createdAttr(path string) Attr {
 	return Attr{Name: "created_at", Desc: "When it was created.", Kind: String, Computed: true, Stable: true, Path: path}
 }
 
-// merge is the prior values with the known ones of the plan on top: what an update sends for attributes the plan leaves open.
 func merge(prior, plan Values) Values {
 	out := Values{}
 	for k, v := range prior {
@@ -181,7 +172,6 @@ func merge(prior, plan Values) Values {
 	return out
 }
 
-// fieldMask is the JSON of a google.protobuf.FieldMask: one string, the paths in lowerCamelCase joined by commas.
 func fieldMask(paths ...string) string {
 	out := make([]string, 0, len(paths))
 	for _, p := range paths {

@@ -13,8 +13,8 @@ const svcDatabase = "cloud.external.database.v1.DatabaseService"
 
 var databaseRunning = states{path: "state", ready: []string{"STATE_RUNNING"}, failed: []string{"STATE_ERROR"}}
 
-// databaseConnection adds the connection details (host, user, password, URI) to the instance's JSON, as far as the caller may read them
-// and the instance has an address; without them the attributes are empty.
+// databaseConnection adds the connection details (host, user, password, URI) to the instance's JSON, as far as
+// the caller may read them and the instance has an address; without them the attributes are empty.
 func databaseConnection(ctx context.Context, c *client.Client, id string, obj map[string]any) {
 	if str(obj, "address") == "" || str(obj, "state") == "STATE_DELETING" {
 		return
@@ -37,7 +37,6 @@ func databaseResource() *Resource {
 		if p.Has("wait_for_running") && !p.Bool("wait_for_running") {
 			return nil
 		}
-		// A change takes the instance out of running a moment after the call: look twice.
 		time.Sleep(2 * time.Second)
 		return waitState(ctx, func() (map[string]any, error) { return get(ctx, c, id) }, databaseRunning)
 	}

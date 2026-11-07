@@ -9,7 +9,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 )
 
-// Set by GoReleaser.
 var version = "dev"
 
 func main() {

@@ -6,7 +6,6 @@ import (
 	"strings"
 )
 
-// Resources and DataSources list what the provider offers, for the documentation generator.
 func Resources() []*Resource { return allResources() }
 
 func DataSources() []*DataSource { return allDataSources() }
@@ -66,7 +65,6 @@ func section(b *strings.Builder, title string, attrs []Attr, pick func(Attr) boo
 	b.WriteString("\n")
 }
 
-// ResourceDoc is the page of a resource for the registry.
 func ResourceDoc(r *Resource, example string) string {
 	var b strings.Builder
 	name := "adatage_" + r.Name
@@ -88,7 +86,6 @@ func ResourceDoc(r *Resource, example string) string {
 	return b.String()
 }
 
-// DataSourceDoc is the page of a data source.
 func DataSourceDoc(d *DataSource, example string) string {
 	var b strings.Builder
 	name := "adatage_" + d.Name

@@ -27,10 +27,8 @@ import (
 
 const operationTimeout = 45 * time.Minute
 
-// errGone is what a Read returns when the object does not exist (any more).
 var errGone = errors.New("not found")
 
-// Gone turns the API's "not found" into errGone.
 func gone(err error) error {
 	if client.IsNotFound(err) {
 		return errGone
@@ -38,20 +36,14 @@ func gone(err error) error {
 	return err
 }
 
-// Resource describes one resource type. Functions get the client and the values of the plan (Create, Update) or the state.
 type Resource struct {
-	Name  string
-	Desc  string
-	Attrs []Attr
-	// ImportFields are the attributes an import ID is made of, joined by "/" (default: id).
+	Name         string
+	Desc         string
+	Attrs        []Attr
 	ImportFields []string
-	// ImportParse overrides how an import ID becomes values.
-	ImportParse func(id string) (Values, error)
+	ImportParse  func(id string) (Values, error)
 
-	// Create makes the object and returns the values that identify it (id and the like) plus any value only Create knows
-	// (a private key); the engine then reads the object.
 	Create func(ctx context.Context, c *client.Client, plan Values) (Values, error)
-	// Read returns the API's JSON object, or errGone.
 	Read   func(ctx context.Context, c *client.Client, state Values) (map[string]any, error)
 	Update func(ctx context.Context, c *client.Client, plan, state Values) error
 	Delete func(ctx context.Context, c *client.Client, state Values) error
@@ -154,7 +146,6 @@ func decode(attrs []Attr, raw tftypes.Value) (Values, error) {
 	return Values(m), nil
 }
 
-// encode builds the Terraform object from values; what is still unknown becomes null.
 func encode(attrs []Attr, v Values) (tftypes.Value, error) {
 	clean := map[string]any{}
 	for k, x := range v {
@@ -209,14 +200,14 @@ func (r *genericResource) save(state *tfsdk.State, d *diag.Diagnostics, v Values
 	state.Raw = raw
 }
 
-// refresh reads the object into values, keeping prior for what the API does not return.
 func (r *genericResource) refresh(ctx context.Context, prior Values) (Values, error) {
 	obj, err := r.spec.Read(ctx, r.c, prior)
 	if err != nil {
 		return nil, err
 	}
 	out := readObject(r.spec.Attrs, obj, prior)
-	// Keep what the plan said for attributes the API leaves out or spells differently, so that Terraform sees no change.
+	// Keep what the plan said for attributes the API leaves out or spells differently, so that Terraform sees no
+	// change.
 	return out, nil
 }
 
@@ -238,7 +229,6 @@ func (r *genericResource) Create(ctx context.Context, req resource.CreateRequest
 	}
 	state, err := r.refresh(ctx, plan)
 	if err != nil {
-		// The object exists but cannot be read: remember it, so a retry does not create it twice.
 		r.save(&resp.State, &resp.Diagnostics, mergeKnown(plan, ids))
 		r.fail(&resp.Diagnostics, "read the new", err)
 		return
@@ -298,7 +288,6 @@ func (r *genericResource) Update(ctx context.Context, req resource.UpdateRequest
 			return
 		}
 	}
-	// Computed values that were unknown in the plan are read again; stable ones keep their state.
 	for k, v := range plan {
 		if isUnknown(v) {
 			plan[k] = prior[k]
@@ -359,7 +348,6 @@ func (r *genericResource) ImportState(ctx context.Context, req resource.ImportSt
 	r.save(&resp.State, &resp.Diagnostics, state)
 }
 
-// DataSource describes one data source: Read gets the values of the configuration and returns the API's JSON object.
 type DataSource struct {
 	Name  string
 	Desc  string
