@@ -35,15 +35,14 @@ func diskResource() *Resource {
 			{Name: "disk_id", Kind: String, Required: true, ForceNew: true, Local: true, Desc: "The name of the disk in the zone: lowercase letters, numbers and hyphens."},
 			{Name: "display_name", Kind: String, Optional: true, Computed: true},
 			{Name: "size_gib", Kind: Int, Required: true, Path: "spec.sizeGib", Desc: "The size in GiB; a disk can only grow."},
-			{Name: "disk_type", Kind: String, Optional: true, Computed: true, Stable: true, ForceNew: true, Path: "spec.diskType", Desc: "The storage pool."},
+			{Name: "disk_type", Kind: String, Required: true, ForceNew: true, Path: "spec.diskType", Desc: "The storage pool: volumes-standard or volumes-performance (see the pools of the region)."},
 			{Name: "image", Kind: String, Optional: true, ForceNew: true, Path: "spec.image", Desc: "A public image to clone; empty for a blank disk."},
 			{Name: "phase", Kind: String, Computed: true, Path: "status.phase", Enum: "DISK_PHASE_"},
 			{Name: "etag", Kind: String, Computed: true},
 			createdAttr("createdAt"),
 		},
 		Create: func(ctx context.Context, c *client.Client, p Values) (Values, error) {
-			spec := map[string]any{"sizeGib": p.Int("size_gib")}
-			set(spec, "diskType", p.Str("disk_type"))
+			spec := map[string]any{"sizeGib": p.Int("size_gib"), "diskType": p.Str("disk_type")}
 			set(spec, "image", p.Str("image"))
 			disk := map[string]any{"spec": spec}
 			set(disk, "displayName", p.Str("display_name"))
@@ -64,7 +63,7 @@ func diskResource() *Resource {
 			name := s.Str("id")
 			etag := s.Str("etag")
 			if p.Has("display_name") && p.Str("display_name") != s.Str("display_name") {
-				op, err := c.Call(ctx, svcDisk, "UpdateDisk", map[string]any{"disk": map[string]any{"name": name, "displayName": p.Str("display_name"), "etag": etag}, "updateMask": map[string]any{"paths": []any{"display_name"}}})
+				op, err := c.Call(ctx, svcDisk, "UpdateDisk", map[string]any{"disk": map[string]any{"name": name, "displayName": p.Str("display_name"), "etag": etag}, "updateMask": fieldMask("display_name")})
 				if err != nil {
 					return err
 				}
@@ -134,7 +133,7 @@ func instanceResource() *Resource {
 				{Name: "kind", Kind: String, Optional: true, Desc: "disk (default) or cdrom."},
 				{Name: "name", Kind: String, Optional: true, Desc: "The name of a new disk."},
 				{Name: "size_gib", Kind: Int, Optional: true},
-				{Name: "storage_pool", Kind: String, Optional: true},
+				{Name: "storage_pool", Kind: String, Optional: true, Desc: "The storage pool of a new disk (required for one): volumes-standard or volumes-performance."},
 				{Name: "image", Kind: String, Optional: true, Desc: "A public image to clone."},
 				{Name: "existing_disk", Kind: String, Optional: true, Desc: "zones/ZONE/disks/DISK of a disk to attach."},
 			}},
@@ -239,7 +238,7 @@ func instanceResource() *Resource {
 		},
 		Update: func(ctx context.Context, c *client.Client, p, s Values) error {
 			id := s.Str("id")
-			var paths []any
+			var paths []string
 			body := map[string]any{"instanceId": id, "etag": s.Str("etag")}
 			if p.Str("name") != s.Str("name") {
 				paths = append(paths, "name")
@@ -254,7 +253,7 @@ func instanceResource() *Resource {
 				body["memoryMib"] = p.Int("memory_mib")
 			}
 			if len(paths) > 0 {
-				body["updateMask"] = map[string]any{"paths": paths}
+				body["updateMask"] = fieldMask(paths...)
 				op, err := c.Call(ctx, svcCompute, "UpdateInstance", body)
 				if err != nil {
 					return err

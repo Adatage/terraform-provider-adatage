@@ -41,15 +41,14 @@ resource "adatage_ssh_key" "admin" {
 }
 
 data "adatage_image" "debian" {
-  os         = "debian"
-  os_version = "13"
+  name = "debian-13-genericcloud-amd64"
 }
 
 resource "adatage_instance" "web" {
   name          = "web"
   region_code   = "eu-central-01"
   zone_code     = "a"
-  series_code   = "general"
+  series_code   = "A"
   vcpus         = 2
   memory_mib    = 4096
   ssh_key_names = [adatage_ssh_key.admin.name]
@@ -57,9 +56,10 @@ resource "adatage_instance" "web" {
   disks = [{
     is_boot     = true
     auto_delete = true
-    name        = "web-boot"
-    size_gib    = 20
-    image       = data.adatage_image.debian.name
+    name         = "web-boot"
+    storage_pool = "volumes-standard"
+    size_gib     = 20
+    image        = data.adatage_image.debian.name
   }]
 
   nics = [{ subnet_id = adatage_subnet.app.id }]

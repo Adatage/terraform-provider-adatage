@@ -364,9 +364,42 @@ func readValues(attrs []Attr, obj map[string]any, prior Values, nested bool) Val
 			out[a.Name] = zero(a)
 			continue
 		}
-		out[a.Name] = convert(a, raw)
+		out[a.Name] = keepSpelling(a, p, convert(a, raw))
 	}
 	return out
+}
+
+// keepSpelling returns what the plan or state had when the API's value only differs in what Terraform treats as the same thing: the
+// whitespace around a text (a key file ends in a newline the API trims) and the order of a list the API sorts. Otherwise Terraform
+// reports an inconsistent result after apply.
+func keepSpelling(a Attr, prior, got any) any {
+	switch a.Kind {
+	case String:
+		if p, ok := prior.(string); ok {
+			if g, ok := got.(string); ok && strings.TrimSpace(p) == strings.TrimSpace(g) {
+				return p
+			}
+		}
+	case StringList:
+		p, ok := prior.([]any)
+		g, ok2 := got.([]any)
+		if ok && ok2 && len(p) == len(g) {
+			count := map[any]int{}
+			for _, x := range g {
+				count[x]++
+			}
+			for _, x := range p {
+				count[x]--
+			}
+			for _, n := range count {
+				if n != 0 {
+					return got
+				}
+			}
+			return prior
+		}
+	}
+	return got
 }
 
 func convert(a Attr, raw any) any {

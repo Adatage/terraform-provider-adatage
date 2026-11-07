@@ -42,20 +42,20 @@ resource "adatage_public_ip" "web" {
 	"resource.disk": `
 resource "adatage_disk" "data" {
   zone     = "eu-central-01a"
-  disk_id  = "data"
-  size_gib = 100
+  disk_id   = "data"
+  disk_type = "volumes-standard"
+  size_gib  = 100
 }`,
 	"resource.instance": `
 data "adatage_image" "debian" {
-  os         = "debian"
-  os_version = "13"
+  name = "debian-13-genericcloud-amd64"
 }
 
 resource "adatage_instance" "web" {
   name        = "web"
   region_code = "eu-central-01"
   zone_code   = "a"
-  series_code = "general"
+  series_code = "A"
   vcpus       = 2
   memory_mib  = 4096
 
@@ -64,9 +64,10 @@ resource "adatage_instance" "web" {
   disks = [{
     is_boot     = true
     auto_delete = true
-    name        = "web-boot"
-    size_gib    = 20
-    image       = data.adatage_image.debian.name
+    name         = "web-boot"
+    storage_pool = "volumes-standard"
+    size_gib     = 20
+    image        = data.adatage_image.debian.name
   }]
 
   nics = [{
@@ -93,7 +94,7 @@ resource "adatage_kubernetes_cluster" "main" {
 
   node_pool = {
     name        = "default"
-    series_code = "general"
+    series_code = "A"
     vcpus       = 2
     memory_mib  = 4096
     size        = 3
@@ -107,7 +108,7 @@ data "adatage_kubernetes_cluster_credentials" "main" {
 resource "adatage_kubernetes_node_pool" "gpu" {
   cluster_id  = adatage_kubernetes_cluster.main.id
   name        = "gpu"
-  series_code = "general"
+  series_code = "A"
   vcpus       = 8
   memory_mib  = 32768
   size        = 1

@@ -391,7 +391,7 @@ func serviceAccountResource() *Resource {
 			}
 			id := str(obj, "serviceAccountId")
 			if p.Bool("disabled") {
-				_, err = c.Call(ctx, svcAccounts, "UpdateServiceAccount", map[string]any{"serviceAccountId": id, "disabled": true, "updateMask": map[string]any{"paths": []any{"disabled"}}})
+				_, err = c.Call(ctx, svcAccounts, "UpdateServiceAccount", map[string]any{"serviceAccountId": id, "disabled": true, "updateMask": fieldMask("disabled")})
 			}
 			return ids("id", id), err
 		},
@@ -399,7 +399,7 @@ func serviceAccountResource() *Resource {
 		Update: func(ctx context.Context, c *client.Client, p, s Values) error {
 			m := merge(s, p)
 			_, err := c.Call(ctx, svcAccounts, "UpdateServiceAccount", map[string]any{"serviceAccountId": s.Str("id"), "displayName": m.Str("display_name"), "description": m.Str("description"),
-				"role": m.Str("role"), "disabled": m.Bool("disabled"), "updateMask": map[string]any{"paths": []any{"display_name", "description", "role", "disabled"}}})
+				"role": m.Str("role"), "disabled": m.Bool("disabled"), "updateMask": fieldMask("display_name", "description", "role", "disabled")})
 			return err
 		},
 		Delete: func(ctx context.Context, c *client.Client, s Values) error {

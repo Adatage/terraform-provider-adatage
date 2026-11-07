@@ -180,3 +180,16 @@ func merge(prior, plan Values) Values {
 	}
 	return out
 }
+
+// fieldMask is the JSON of a google.protobuf.FieldMask: one string, the paths in lowerCamelCase joined by commas.
+func fieldMask(paths ...string) string {
+	out := make([]string, 0, len(paths))
+	for _, p := range paths {
+		parts := strings.Split(p, ".")
+		for i := range parts {
+			parts[i] = camel(parts[i])
+		}
+		out = append(out, strings.Join(parts, "."))
+	}
+	return strings.Join(out, ",")
+}

@@ -279,3 +279,26 @@ func TestPlanCreate(t *testing.T) {
 	plan("adatage_kubernetes_node_pool", kubernetesNodePoolResource(), Values{"cluster_id": "1", "name": "p", "series_code": "g", "vcpus": int64(2), "memory_mib": int64(2048), "size": int64(1),
 		"taints": []any{map[string]any{"key": "k", "value": "v", "effect": "NoSchedule"}}})
 }
+
+func TestKeepSpelling(t *testing.T) {
+	text := Attr{Name: "k", Kind: String}
+	list := Attr{Name: "l", Kind: StringList}
+	if got := keepSpelling(text, "ssh-ed25519 AAA k\n", "ssh-ed25519 AAA k"); got != "ssh-ed25519 AAA k\n" {
+		t.Fatalf("whitespace: %q", got)
+	}
+	if got := keepSpelling(text, "a", "b"); got != "b" {
+		t.Fatalf("a real change stays: %q", got)
+	}
+	if got := keepSpelling(list, []any{"b", "a"}, []any{"a", "b"}); got.([]any)[0] != "b" {
+		t.Fatalf("the order of the plan stays: %v", got)
+	}
+	if got := keepSpelling(list, []any{"b", "a"}, []any{"a", "c"}); got.([]any)[1] != "c" {
+		t.Fatalf("a real change stays: %v", got)
+	}
+}
+
+func TestFieldMask(t *testing.T) {
+	if got := fieldMask("name", "memory_mib", "spec.disk_gib"); got != "name,memoryMib,spec.diskGib" {
+		t.Fatalf("field mask: %q", got)
+	}
+}
