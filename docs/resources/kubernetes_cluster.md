@@ -20,7 +20,7 @@ resource "adatage_kubernetes_cluster" "main" {
 
   node_pool = {
     name        = "default"
-    series_code = "general"
+    series_code = "A"
     vcpus       = 2
     memory_mib  = 4096
     size        = 3

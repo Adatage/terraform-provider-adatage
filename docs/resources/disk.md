@@ -14,8 +14,9 @@ A block disk in a zone. Attach it to an instance with the disks block of adatage
 ```terraform
 resource "adatage_disk" "data" {
   zone     = "eu-central-01a"
-  disk_id  = "data"
-  size_gib = 100
+  disk_id   = "data"
+  disk_type = "volumes-standard"
+  size_gib  = 100
 }
 ```
 
@@ -24,12 +25,12 @@ resource "adatage_disk" "data" {
 ### Required
 
 - `disk_id` (String) The name of the disk in the zone: lowercase letters, numbers and hyphens. (changing it replaces the resource; not read back from the API)
+- `disk_type` (String) The storage pool: volumes-standard or volumes-performance (see the pools of the region). (changing it replaces the resource)
 - `size_gib` (Number) The size in GiB; a disk can only grow.
 - `zone` (String) The zone, for example eu-central-01a. (changing it replaces the resource; not read back from the API)
 
 ### Optional
 
-- `disk_type` (String) The storage pool. (changing it replaces the resource)
 - `display_name` (String) 
 - `image` (String) A public image to clone; empty for a blank disk. (changing it replaces the resource)
 

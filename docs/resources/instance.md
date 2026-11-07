@@ -13,15 +13,14 @@ A virtual machine. The disks and nics blocks are used when the instance is creat
 
 ```terraform
 data "adatage_image" "debian" {
-  os         = "debian"
-  os_version = "13"
+  name = "debian-13-genericcloud-amd64"
 }
 
 resource "adatage_instance" "web" {
   name        = "web"
   region_code = "eu-central-01"
   zone_code   = "a"
-  series_code = "general"
+  series_code = "A"
   vcpus       = 2
   memory_mib  = 4096
 
@@ -30,9 +29,10 @@ resource "adatage_instance" "web" {
   disks = [{
     is_boot     = true
     auto_delete = true
-    name        = "web-boot"
-    size_gib    = 20
-    image       = data.adatage_image.debian.name
+    name         = "web-boot"
+    storage_pool = "volumes-standard"
+    size_gib     = 20
+    image        = data.adatage_image.debian.name
   }]
 
   nics = [{
@@ -52,7 +52,7 @@ resource "adatage_instance" "web" {
   - `kind` (String) disk (default) or cdrom.
   - `name` (String) The name of a new disk.
   - `size_gib` (Number) 
-  - `storage_pool` (String) 
+  - `storage_pool` (String) The storage pool of a new disk (required for one): volumes-standard or volumes-performance.
   - `image` (String) A public image to clone.
   - `existing_disk` (String) zones/ZONE/disks/DISK of a disk to attach.
 - `memory_mib` (Number) 

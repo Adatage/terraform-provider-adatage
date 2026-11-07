@@ -15,7 +15,7 @@ A pool of identical nodes of a cluster. Import with cluster_id/node_pool_id.
 resource "adatage_kubernetes_node_pool" "gpu" {
   cluster_id  = adatage_kubernetes_cluster.main.id
   name        = "gpu"
-  series_code = "general"
+  series_code = "A"
   vcpus       = 8
   memory_mib  = 32768
   size        = 1
